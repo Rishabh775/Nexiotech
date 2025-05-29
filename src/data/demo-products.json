@@ -1,0 +1,80 @@
+[
+  {
+    "id": 1,
+    "name": "Geometric Sculpture",
+    "image": "https://images.pexels.com/photos/6147369/pexels-photo-6147369.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    "description": "A stunning geometric sculpture with intricate patterns that catch the light beautifully. Each piece is carefully printed with premium materials for durability and visual impact.",
+    "detailedDescription": "This geometric sculpture represents the perfect blend of mathematics and art. The complex patterns are generated using parametric algorithms, making each piece uniquely mesmerizing. The sculpture stands 12 inches tall and is printed using our premium PLA filament with a metallic finish that catches and reflects light in stunning ways. Perfect as a centerpiece or statement art for modern interiors.",
+    "category": "Abstract",
+    "price": 129.99,
+    "customizable": true,
+    "dimensions": "12\" x 8\" x 8\"",
+    "material": "Premium PLA",
+    "weight": "1.2 lbs"
+  },
+  {
+    "id": 2,
+    "name": "Architectural Cityscape",
+    "image": "https://images.pexels.com/photos/1619317/pexels-photo-1619317.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    "description": "A detailed miniature cityscape featuring iconic buildings from around the world. Perfect for architecture enthusiasts and collectors.",
+    "detailedDescription": "Our Architectural Cityscape is a celebration of human engineering and design. This intricate piece features meticulously detailed replicas of iconic buildings from major cities worldwide, all arranged in a harmonious composition. Each building is printed with extreme precision to capture the architectural details that make these structures famous. The entire cityscape measures 18 inches wide and is mounted on a solid base with a protective clear dome available as an optional add-on.",
+    "category": "Architecture",
+    "price": 249.99,
+    "customizable": true,
+    "dimensions": "18\" x 12\" x 6\"",
+    "material": "High-detail resin",
+    "weight": "2.5 lbs"
+  },
+  {
+    "id": 3,
+    "name": "Organic Vase Collection",
+    "image": "https://images.pexels.com/photos/6044198/pexels-photo-6044198.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    "description": "A set of three organically-inspired vases with flowing, natural forms. Functional art that brings nature into your home.",
+    "detailedDescription": "Our Organic Vase Collection draws inspiration from natural forms found in coral reefs, plant structures, and fluid dynamics. Each of the three unique vases features flowing, undulating surfaces that create fascinating light and shadow play. The vases are fully functional and waterproof, perfect for displaying fresh flowers or as standalone sculptural pieces. Printed using our specialized waterproof filament with a semi-translucent finish that allows light to partially penetrate the surface, creating a warm glow when placed near light sources.",
+    "category": "Functional",
+    "price": 159.99,
+    "customizable": true,
+    "dimensions": "Varies (largest: 10\" x 6\" x 6\")",
+    "material": "Waterproof PLA blend",
+    "weight": "1.8 lbs (set)"
+  },
+  {
+    "id": 4,
+    "name": "Mechanical Clock",
+    "image": "https://images.pexels.com/photos/3973089/pexels-photo-3973089.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    "description": "A fully functional mechanical clock with visible gears and mechanisms. A marvel of 3D printing engineering and precision.",
+    "detailedDescription": "Our Mechanical Clock is a testament to the precision possible with modern 3D printing technology. This fully functional timepiece features exposed gears and mechanisms that allow you to see exactly how mechanical clocks work. Each gear and component is printed with extreme precision to ensure smooth operation and accurate timekeeping. The clock requires minimal assembly and runs on a single AA battery (not included). The transparent housing showcases the beautiful complexity of the mechanism while protecting the delicate parts.",
+    "category": "Functional",
+    "price": 199.99,
+    "customizable": false,
+    "dimensions": "8\" x 8\" x 4\"",
+    "material": "Precision PLA and metal components",
+    "weight": "1.5 lbs"
+  },
+  {
+    "id": 5,
+    "name": "Abstract Wave Sculpture",
+    "image": "https://images.pexels.com/photos/7005693/pexels-photo-7005693.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    "description": "A flowing wave sculpture that captures the essence of ocean movement in a static form. A mesmerizing piece for any space.",
+    "detailedDescription": "The Abstract Wave Sculpture captures the dynamic energy and fluid motion of ocean waves in a static form. Using computational fluid dynamics simulations, we've created a piece that seems to freeze a perfect wave in time. The undulating surfaces create fascinating patterns of light and shadow that change throughout the day as light moves across the sculpture. Printed in our signature pearl-finish material that mimics the iridescent quality of water, this piece brings a sense of calm and movement to any space.",
+    "category": "Abstract",
+    "price": 179.99,
+    "customizable": true,
+    "dimensions": "14\" x 8\" x 6\"",
+    "material": "Pearl-finish PLA",
+    "weight": "1.3 lbs"
+  },
+  {
+    "id": 6,
+    "name": "Botanical Wall Art",
+    "image": "https://images.pexels.com/photos/1906439/pexels-photo-1906439.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    "description": "A series of botanical-inspired wall panels that create a stunning natural display. Perfect for adding organic texture to any wall.",
+    "detailedDescription": "Our Botanical Wall Art series transforms any wall into a celebration of natural forms and textures. This set of three interconnected panels features intricate botanical patterns inspired by leaf structures, cellular patterns, and plant growth algorithms. The panels can be arranged in multiple configurations to create different effects and can be painted to match any decor (though many customers prefer the clean, modern look of our standard white or natural bamboo finish). Each panel includes integrated hanging hardware for easy installation.",
+    "category": "Wall Art",
+    "price": 149.99,
+    "customizable": true,
+    "dimensions": "Each panel: 12\" x 12\" x 1\"",
+    "material": "Bamboo PLA or Standard White",
+    "weight": "2.2 lbs (set)"
+  }
+]
