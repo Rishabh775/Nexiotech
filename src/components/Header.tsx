@@ -51,6 +51,11 @@ const Header: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close menu when route changes
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
+
   const handleLogout = () => {
     logout();
     navigate("/");
@@ -247,7 +252,7 @@ const Header: React.FC = () => {
                   to="/auth"
                   className={`px-4 py-2 rounded-md transition-colors ${
                     !isScrolled && location.pathname === "/"
-                      ? "bg-white text-indigo-600 hover:bg-white/90"
+                      ? "bg-white text-blue-600 hover:bg-white/90"
                       : "bg-primary text-primary-foreground hover:bg-primary/90"
                   }`}
                 >
@@ -307,78 +312,114 @@ const Header: React.FC = () => {
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
-              className="md:hidden py-4 border-t border-border"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
+              className="md:hidden fixed inset-x-0 top-16 bg-background/95 backdrop-blur-md border-b border-border shadow-lg"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
             >
-              <nav className="flex flex-col space-y-4">
-                <Link
-                  to="/"
-                  className={`${getNavLinkClasses("/")} block`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Home
-                  {isActivePath("/") && (
-                    <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
-                  )}
-                </Link>
-                <Link
-                  to="/products"
-                  className={`${getNavLinkClasses("/products")} block`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Products
-                  {isActivePath("/products") && (
-                    <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
-                  )}
-                </Link>
-                <Link
-                  to="/contact"
-                  className={`${getNavLinkClasses("/contact")} block`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Contact
-                  {isActivePath("/contact") && (
-                    <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
-                  )}
-                </Link>
-                {user ? (
-                  <>
-                    <Link
-                      to="/profile"
-                      className={`${getNavLinkClasses("/profile")} block`}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Profile
-                      {isActivePath("/profile") && (
-                        <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
-                      )}
-                    </Link>
-                    <button
-                      onClick={() => {
-                        handleLogout();
-                        setIsMenuOpen(false);
-                      }}
-                      className="text-left text-foreground hover:text-primary transition-colors"
-                    >
-                      Logout
-                    </button>
-                  </>
-                ) : (
+              <div className="container mx-auto px-4 py-6">
+                <nav className="flex flex-col space-y-4">
                   <Link
-                    to="/auth"
-                    className={`${getNavLinkClasses("/auth")} block`}
+                    to="/"
+                    className="flex items-center px-4 py-3 rounded-lg text-foreground hover:bg-accent transition-colors relative"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Sign In
-                    {isActivePath("/auth") && (
+                    Home
+                    {isActivePath("/") && (
                       <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
                     )}
                   </Link>
-                )}
-              </nav>
+                  <Link
+                    to="/products"
+                    className="flex items-center px-4 py-3 rounded-lg text-foreground hover:bg-accent transition-colors relative"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Products
+                    {isActivePath("/products") && (
+                      <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
+                    )}
+                  </Link>
+                  <Link
+                    to="/contact"
+                    className="flex items-center px-4 py-3 rounded-lg text-foreground hover:bg-accent transition-colors relative"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Contact
+                    {isActivePath("/contact") && (
+                      <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
+                    )}
+                  </Link>
+
+                  <div className="border-t border-border pt-4 mt-4">
+                    {user ? (
+                      <>
+                        <Link
+                          to="/profile"
+                          className="flex items-center px-4 py-3 rounded-lg text-foreground hover:bg-accent transition-colors relative"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <User className="h-5 w-5 mr-3" />
+                          Profile
+                          {isActivePath("/profile") && (
+                            <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
+                          )}
+                        </Link>
+                        {user.role === "admin" && (
+                          <Link
+                            to="/admin"
+                            className="flex items-center px-4 py-3 rounded-lg text-foreground hover:bg-accent transition-colors relative"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            Admin Dashboard
+                            {isActivePath("/admin") && (
+                              <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
+                            )}
+                          </Link>
+                        )}
+                        <button
+                          onClick={() => {
+                            handleLogout();
+                            setIsMenuOpen(false);
+                          }}
+                          className="flex items-center w-full px-4 py-3 rounded-lg text-foreground hover:bg-accent transition-colors"
+                        >
+                          <LogOut className="h-5 w-5 mr-3" />
+                          Logout
+                        </button>
+                      </>
+                    ) : (
+                      <Link
+                        to="/auth"
+                        className="flex items-center px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <User className="h-5 w-5 mr-3" />
+                        Sign In
+                      </Link>
+                    )}
+
+                    <button
+                      className="flex items-center w-full px-4 py-3 rounded-lg text-foreground hover:bg-accent transition-colors mt-2"
+                      onClick={() =>
+                        setTheme(theme === "dark" ? "light" : "dark")
+                      }
+                    >
+                      {theme === "dark" ? (
+                        <>
+                          <Sun className="h-5 w-5 mr-3" />
+                          Light Mode
+                        </>
+                      ) : (
+                        <>
+                          <Moon className="h-5 w-5 mr-3" />
+                          Dark Mode
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </nav>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
