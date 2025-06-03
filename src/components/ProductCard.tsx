@@ -21,44 +21,44 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const addToCart = useStore(state => state.addToCart);
   
   return (
-    <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
-      <div className="h-64 overflow-hidden">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="aspect-square overflow-hidden">
         <img 
           src={product.image} 
-          alt={product.name} 
-          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          alt={product.name}
+          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
         />
       </div>
       
-      <div className="p-5">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
-          <span className="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full">
-            {product.category}
-          </span>
-        </div>
-        
-        <p className="text-gray-600 mb-4 line-clamp-2">{product.description}</p>
-        
-        <div className="flex justify-between items-center">
-          <span className="text-lg font-bold text-gray-900">${product.price.toFixed(2)}</span>
-          
-          <div className="flex space-x-2">
-            <button 
-              onClick={() => addToCart(product)}
-              className="p-2 rounded-full bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors"
-              aria-label="Add to cart"
-            >
-              <ShoppingCart className="h-5 w-5" />
-            </button>
-            
+      <div className="p-4">
+        <div className="mb-4">
+          <div className="flex items-start justify-between mb-2">
             <Link 
               to={`/products/${product.id}`}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+              className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors"
             >
-              View Details
+              {product.name}
             </Link>
+            <span className="text-sm px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
+              {product.category}
+            </span>
           </div>
+          <p className="text-gray-600 text-sm line-clamp-2">
+            {product.description}
+          </p>
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <span className="text-xl font-bold text-gray-900">
+            ${product.price.toFixed(2)}
+          </span>
+          <button 
+            onClick={() => addToCart(product)}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <ShoppingCart className="h-5 w-5 mr-2" />
+            Add to Cart
+          </button>
         </div>
       </div>
     </div>
