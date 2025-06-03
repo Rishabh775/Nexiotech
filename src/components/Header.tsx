@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+"use client";
+
+import type React from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Printer as Printer3D,
   Menu,
   X,
   ShoppingCart,
@@ -24,6 +27,7 @@ import {
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,6 +37,19 @@ const Header: React.FC = () => {
   const logout = useStore((state) => state.logout);
 
   const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -52,19 +69,61 @@ const Header: React.FC = () => {
     const baseClasses = "transition-colors relative";
     const activeClasses = "text-primary font-medium";
     const inactiveClasses = "text-foreground hover:text-primary";
+    const homeActiveClasses =
+      !isScrolled && location.pathname === "/"
+        ? "text-white font-medium"
+        : activeClasses;
+    const homeInactiveClasses =
+      !isScrolled && location.pathname === "/"
+        ? "text-white/90 hover:text-white"
+        : inactiveClasses;
 
     return `${baseClasses} ${
-      isActivePath(path) ? activeClasses : inactiveClasses
+      isActivePath(path)
+        ? path === "/" && location.pathname === "/"
+          ? homeActiveClasses
+          : activeClasses
+        : path === "/" && location.pathname === "/"
+        ? homeInactiveClasses
+        : inactiveClasses
     }`;
   };
 
   return (
-    <header className="bg-background border-b">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex justify-between items-center">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled || location.pathname !== "/"
+          ? "bg-background/80 backdrop-blur-md shadow-lg border-b border-border/20"
+          : "bg-transparent"
+      }`}
+    >
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center h-16 md:h-20">
           <Link to="/" className="flex items-center space-x-2">
-            <Printer3D className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`h-8 w-8 ${
+                isScrolled || location.pathname !== "/"
+                  ? "text-primary"
+                  : "text-white"
+              }`}
+            >
+              <path d="M6 9h12v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9Z"></path>
+              <path d="M5 4h14a1 1 0 0 1 1 1v4H4V5a1 1 0 0 1 1-1Z"></path>
+            </svg>
+            <span
+              className={`text-xl font-bold ${
+                isScrolled || location.pathname !== "/"
+                  ? "text-foreground"
+                  : "text-white"
+              }`}
+            >
               3D Art Prints
             </span>
           </Link>
@@ -74,19 +133,37 @@ const Header: React.FC = () => {
               <Link to="/" className={getNavLinkClasses("/")}>
                 Home
                 {isActivePath("/") && (
-                  <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-primary rounded-full"></span>
+                  <span
+                    className={`absolute -bottom-2 left-0 w-full h-0.5 ${
+                      !isScrolled && location.pathname === "/"
+                        ? "bg-white"
+                        : "bg-primary"
+                    } rounded-full`}
+                  ></span>
                 )}
               </Link>
               <Link to="/products" className={getNavLinkClasses("/products")}>
                 Products
                 {isActivePath("/products") && (
-                  <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-primary rounded-full"></span>
+                  <span
+                    className={`absolute -bottom-2 left-0 w-full h-0.5 ${
+                      !isScrolled && location.pathname === "/"
+                        ? "bg-white"
+                        : "bg-primary"
+                    } rounded-full`}
+                  ></span>
                 )}
               </Link>
               <Link to="/contact" className={getNavLinkClasses("/contact")}>
                 Contact
                 {isActivePath("/contact") && (
-                  <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-primary rounded-full"></span>
+                  <span
+                    className={`absolute -bottom-2 left-0 w-full h-0.5 ${
+                      !isScrolled && location.pathname === "/"
+                        ? "bg-white"
+                        : "bg-primary"
+                    } rounded-full`}
+                  ></span>
                 )}
               </Link>
             </nav>
@@ -94,16 +171,24 @@ const Header: React.FC = () => {
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="p-2 hover:bg-accent rounded-full transition-colors"
+                className={`p-2 rounded-full transition-colors ${
+                  !isScrolled && location.pathname === "/"
+                    ? "text-white hover:bg-white/10"
+                    : "hover:bg-accent text-foreground"
+                }`}
               >
-                <Search className="h-5 w-5 text-foreground" />
+                <Search className="h-5 w-5" />
               </button>
 
               <Link
                 to="/cart"
-                className="relative p-2 hover:bg-accent rounded-full transition-colors"
+                className={`relative p-2 rounded-full transition-colors ${
+                  !isScrolled && location.pathname === "/"
+                    ? "text-white hover:bg-white/10"
+                    : "hover:bg-accent text-foreground"
+                }`}
               >
-                <ShoppingCart className="h-5 w-5 text-foreground" />
+                <ShoppingCart className="h-5 w-5" />
                 {cartItemCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
                     {cartItemCount}
@@ -112,20 +197,31 @@ const Header: React.FC = () => {
               </Link>
 
               <button
-                className="p-2 hover:bg-accent rounded-full transition-colors"
+                className={`p-2 rounded-full transition-colors ${
+                  !isScrolled && location.pathname === "/"
+                    ? "text-white hover:bg-white/10"
+                    : "hover:bg-accent text-foreground"
+                }`}
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                aria-label="Toggle theme"
               >
                 {theme === "dark" ? (
-                  <Sun className="h-5 w-5 text-foreground" />
+                  <Sun className="h-5 w-5" />
                 ) : (
-                  <Moon className="h-5 w-5 text-foreground" />
+                  <Moon className="h-5 w-5" />
                 )}
               </button>
 
               {user ? (
                 <DropdownMenu>
-                  <DropdownMenuTrigger className="p-2 hover:bg-accent rounded-full transition-colors">
-                    <User className="h-5 w-5 text-foreground" />
+                  <DropdownMenuTrigger
+                    className={`p-2 rounded-full transition-colors ${
+                      !isScrolled && location.pathname === "/"
+                        ? "text-white hover:bg-white/10"
+                        : "hover:bg-accent text-foreground"
+                    }`}
+                  >
+                    <User className="h-5 w-5" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem onClick={() => navigate("/profile")}>
@@ -149,7 +245,11 @@ const Header: React.FC = () => {
               ) : (
                 <Link
                   to="/auth"
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                  className={`px-4 py-2 rounded-md transition-colors ${
+                    !isScrolled && location.pathname === "/"
+                      ? "bg-white text-indigo-600 hover:bg-white/90"
+                      : "bg-primary text-primary-foreground hover:bg-primary/90"
+                  }`}
                 >
                   Sign In
                 </Link>
@@ -158,8 +258,15 @@ const Header: React.FC = () => {
           </div>
 
           <div className="md:hidden flex items-center space-x-4">
-            <Link to="/cart" className="relative">
-              <ShoppingCart className="h-6 w-6 text-foreground" />
+            <Link
+              to="/cart"
+              className={`relative ${
+                !isScrolled && location.pathname === "/"
+                  ? "text-white"
+                  : "text-foreground"
+              }`}
+            >
+              <ShoppingCart className="h-6 w-6" />
               {cartItemCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {cartItemCount}
@@ -168,7 +275,12 @@ const Header: React.FC = () => {
             </Link>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-foreground focus:outline-none"
+              className={`focus:outline-none ${
+                !isScrolled && location.pathname === "/"
+                  ? "text-white"
+                  : "text-foreground"
+              }`}
+              aria-label="Toggle menu"
             >
               {isMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -180,88 +292,96 @@ const Header: React.FC = () => {
         </div>
 
         {isSearchOpen && (
-          <div className="mt-4">
+          <div className="mt-4 pb-4">
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search products..."
-                className="w-full px-4 py-2 pl-10 bg-background border rounded-md focus:ring-2 focus:ring-primary"
+                className="w-full px-4 py-2 pl-10 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             </div>
           </div>
         )}
 
-        {isMenuOpen && (
-          <div className="md:hidden mt-4 py-4 border-t">
-            <nav className="flex flex-col space-y-4">
-              <Link
-                to="/"
-                className={`${getNavLinkClasses("/")} block`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Home
-                {isActivePath("/") && (
-                  <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
-                )}
-              </Link>
-              <Link
-                to="/products"
-                className={`${getNavLinkClasses("/products")} block`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Products
-                {isActivePath("/products") && (
-                  <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
-                )}
-              </Link>
-              <Link
-                to="/contact"
-                className={`${getNavLinkClasses("/contact")} block`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Contact
-                {isActivePath("/contact") && (
-                  <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
-                )}
-              </Link>
-              {user ? (
-                <>
-                  <Link
-                    to="/profile"
-                    className={`${getNavLinkClasses("/profile")} block`}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Profile
-                    {isActivePath("/profile") && (
-                      <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
-                    )}
-                  </Link>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsMenuOpen(false);
-                    }}
-                    className="text-left text-foreground hover:text-primary transition-colors"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              className="md:hidden py-4 border-t border-border"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <nav className="flex flex-col space-y-4">
                 <Link
-                  to="/auth"
-                  className={`${getNavLinkClasses("/auth")} block`}
+                  to="/"
+                  className={`${getNavLinkClasses("/")} block`}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Sign In
-                  {isActivePath("/auth") && (
+                  Home
+                  {isActivePath("/") && (
                     <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
                   )}
                 </Link>
-              )}
-            </nav>
-          </div>
-        )}
+                <Link
+                  to="/products"
+                  className={`${getNavLinkClasses("/products")} block`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Products
+                  {isActivePath("/products") && (
+                    <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
+                  )}
+                </Link>
+                <Link
+                  to="/contact"
+                  className={`${getNavLinkClasses("/contact")} block`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Contact
+                  {isActivePath("/contact") && (
+                    <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
+                  )}
+                </Link>
+                {user ? (
+                  <>
+                    <Link
+                      to="/profile"
+                      className={`${getNavLinkClasses("/profile")} block`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Profile
+                      {isActivePath("/profile") && (
+                        <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
+                      )}
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsMenuOpen(false);
+                      }}
+                      className="text-left text-foreground hover:text-primary transition-colors"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/auth"
+                    className={`${getNavLinkClasses("/auth")} block`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign In
+                    {isActivePath("/auth") && (
+                      <span className="absolute left-0 top-0 w-1 h-full bg-primary rounded-r-full"></span>
+                    )}
+                  </Link>
+                )}
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </header>
   );

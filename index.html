@@ -1,15 +1,30 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>3D Art Prints | Custom 3D Printed Art</title>
-    <meta name="description" content="Unique, customizable 3D printed art pieces for your home or office. Browse our collection or request a custom design.">
-    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <meta
+      name="description"
+      content="Unique, customizable 3D printed art pieces for your home or office. Browse our collection or request a custom design."
+    />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <script>
+      // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+      if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    </script>
   </head>
-  <body class="bg-gray-50">
-    <div id="root"></div>
+  <body class="min-h-screen antialiased">
+    <div id="root" class="flex flex-col min-h-screen overflow-x-hidden"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
