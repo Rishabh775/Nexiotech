@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { toast } from "../hooks/use-toast";
 import productsData from "../data/demo-products.json";
 
 interface Product {
@@ -68,7 +69,7 @@ const demoUsers = [
   },
 ];
 
-const useStore = create<StoreState>((set) => ({
+const useStore = create<StoreState>((set, get) => ({
   products: productsData as Product[],
   cart: [],
   customRequests: [],
@@ -81,6 +82,15 @@ const useStore = create<StoreState>((set) => ({
       );
 
       if (existingItem) {
+        // Show toast for quantity increase
+        toast({
+          variant: "success",
+          title: "Quantity Updated!",
+          description: `${product.name} quantity increased to ${
+            existingItem.quantity + 1
+          }`,
+        });
+
         return {
           cart: state.cart.map((item) =>
             item.product.id === product.id
@@ -89,6 +99,13 @@ const useStore = create<StoreState>((set) => ({
           ),
         };
       } else {
+        // Show toast for new item added
+        toast({
+          variant: "success",
+          title: "Added to Cart!",
+          description: `${product.name} has been added to your cart`,
+        });
+
         return {
           cart: [...state.cart, { product, quantity: 1 }],
         };
@@ -96,20 +113,54 @@ const useStore = create<StoreState>((set) => ({
     }),
 
   removeFromCart: (productId: number) =>
-    set((state) => ({
-      cart: state.cart.filter((item) => item.product.id !== productId),
-    })),
+    set((state) => {
+      const item = state.cart.find((item) => item.product.id === productId);
+      if (item) {
+        toast({
+          variant: "default",
+          title: "Removed from Cart",
+          description: `${item.product.name} has been removed from your cart`,
+        });
+      }
+
+      return {
+        cart: state.cart.filter((item) => item.product.id !== productId),
+      };
+    }),
 
   updateQuantity: (productId: number, quantity: number) =>
-    set((state) => ({
-      cart: state.cart.map((item) =>
-        item.product.id === productId
-          ? { ...item, quantity: Math.max(1, quantity) }
-          : item
-      ),
-    })),
+    set((state) => {
+      const item = state.cart.find((item) => item.product.id === productId);
+      if (item) {
+        toast({
+          variant: "success",
+          title: "Quantity Updated",
+          description: `${item.product.name} quantity changed to ${quantity}`,
+        });
+      }
 
-  clearCart: () => set({ cart: [] }),
+      return {
+        cart: state.cart.map((item) =>
+          item.product.id === productId
+            ? { ...item, quantity: Math.max(1, quantity) }
+            : item
+        ),
+      };
+    }),
+
+  clearCart: () => {
+    const cartLength = get().cart.length;
+    if (cartLength > 0) {
+      toast({
+        variant: "default",
+        title: "Cart Cleared",
+        description: `Removed ${cartLength} item${
+          cartLength > 1 ? "s" : ""
+        } from your cart`,
+      });
+    }
+    set({ cart: [] });
+  },
 
   submitCustomRequest: (request: CustomRequest) =>
     set((state) => ({
