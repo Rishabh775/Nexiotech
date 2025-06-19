@@ -18,7 +18,7 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-8">
+    <div className="container mx-auto px-4 py-8 mt-12">
       <div className="max-w-4xl mx-auto">
         <div className="bg-card rounded-lg shadow-lg p-6 mb-6">
           <div className="flex items-center space-x-4 mb-6">
