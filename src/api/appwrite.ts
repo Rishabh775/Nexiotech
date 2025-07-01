@@ -6,7 +6,7 @@ export interface User {
   password: string;
 }
 
-import { Client, Account, Avatars, Databases, Query } from "appwrite";
+import { Client, Account, Avatars, Databases, Query, ID } from "appwrite";
 
 const client = new Client()
   .setEndpoint(import.meta.env.VITE_APPWRITE_URL) // Your Appwrite Endpoint
