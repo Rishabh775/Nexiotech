@@ -1,6 +1,13 @@
 import { create } from "zustand";
 import { toast } from "../hooks/use-toast";
 import productsData from "../data/demo-products.json";
+import {
+  signUp,
+  logIn,
+  logOut,
+  getCurrentUser,
+  getUserById,
+} from "../api/appwrite";
 
 interface Product {
   id: number;
@@ -50,24 +57,6 @@ interface StoreState {
   logout: () => void;
   register: (email: string, password: string, name: string) => Promise<void>;
 }
-
-// Demo user data - In a real app, this would be in a database
-const demoUsers = [
-  {
-    id: "1",
-    email: "admin@example.com",
-    password: "admin123",
-    name: "Admin User",
-    role: "admin" as const,
-  },
-  {
-    id: "2",
-    email: "user@example.com",
-    password: "user123",
-    name: "Demo User",
-    role: "user" as const,
-  },
-];
 
 const useStore = create<StoreState>((set, get) => ({
   products: productsData as Product[],
@@ -167,38 +156,84 @@ const useStore = create<StoreState>((set, get) => ({
       customRequests: [...state.customRequests, request],
     })),
 
-  login: async (email: string, password: string) => {
-    // Simulate API call
-    const user = demoUsers.find(
-      (u) => u.email === email && u.password === password
-    );
-    if (!user) {
-      throw new Error("Invalid credentials");
-    }
+  login: async (email, password) => {
+    try {
+      await logIn({ email, password });
+      const currentUser = await getCurrentUser();
+      console.log("Logged in User:", currentUser);
 
-    const { password: _, ...userWithoutPassword } = user;
-    set({ user: userWithoutPassword });
+      const userData = await getUserById(currentUser.$id);
+      console.log("User Data:", userData);
+
+      set({
+        user: {
+          id: userData.$id,
+          email: userData.email,
+          name: userData.name,
+          role: userData.role || "user", // Default to 'user' if role is not set
+        },
+      });
+
+      toast({
+        variant: "success",
+        title: "Login Successful",
+        description: `Welcome back, ${userData.name}`,
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: error.message || "Invalid credentials",
+      });
+      throw error;
+    }
   },
 
-  logout: () => {
-    set({ user: null });
+  logout: async () => {
+    try {
+      await logOut();
+      set({ user: null });
+      toast({
+        variant: "default",
+        title: "Logged Out",
+        description: "You have been logged out successfully.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Logout Error",
+        description: error.message,
+      });
+    }
   },
 
-  register: async (email: string, password: string, name: string) => {
-    // Simulate API call
-    const existingUser = demoUsers.find((u) => u.email === email);
-    if (existingUser) {
-      throw new Error("User already exists");
+  register: async (email, password, name) => {
+    try {
+      const result = await signUp({ email, password, name });
+      console.log("Registered User:", result);
+
+      set({
+        user: {
+          id: result.userId,
+          email: result.email,
+          name: result.name,
+          role: result.role,
+        },
+      });
+
+      toast({
+        variant: "success",
+        title: "Account Created",
+        description: `Welcome, ${result.name}`,
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Signup Error",
+        description: error.message,
+      });
+      throw error;
     }
-
-    const newUser = {
-      id: String(demoUsers.length + 1),
-      email,
-      name,
-      role: "user" as const,
-    };
-
-    set({ user: newUser });
   },
 }));
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useStore from "../store/store";
 import { User, Settings, LogOut, ShoppingBag } from "lucide-react";
@@ -7,15 +7,21 @@ const ProfilePage: React.FC = () => {
   const { user, logout } = useStore();
   const navigate = useNavigate();
 
-  if (!user) {
-    navigate("/auth");
-    return null;
-  }
+  useEffect(() => {
+    // Redirect to auth page if user is not logged in
+    if (!user) {
+      navigate("/auth");
+    }
+  }, [user, navigate]);
 
   const handleLogout = () => {
     logout();
     navigate("/");
   };
+
+  if (!user) {
+    return null; // or a loading spinner
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 mt-12">
@@ -42,13 +48,13 @@ const ProfilePage: React.FC = () => {
               <p className="text-2xl font-bold mt-2">0</p>
             </div>
 
-            <div className="bg-background p-4 rounded-lg">
+            {/* <div className="bg-background p-4 rounded-lg">
               <div className="flex items-center space-x-2 text-card-foreground">
                 <Settings className="h-5 w-5" />
                 <span>Role</span>
               </div>
               <p className="text-2xl font-bold mt-2 capitalize">{user.role}</p>
-            </div>
+            </div> */}
           </div>
 
           {user.role === "admin" && (
