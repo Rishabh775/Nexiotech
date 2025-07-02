@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import useStore from "../store/store";
 import { Mail, Lock, User } from "lucide-react";
-import { getCurrentUser } from "../api/appwrite";
+import { getCurrentUser, getUserById } from "../api/appwrite";
 import LoadingComp from "../components/LoadingComp";
 
 interface AuthFormData {
@@ -45,15 +45,18 @@ const AuthPage: React.FC = () => {
       const currentUser = await getCurrentUser();
 
       if (currentUser) {
-        const role =
-          currentUser.email === "admin@example.com" ? "admin" : "user";
-
+        const userData = await getUserById(currentUser.$id);
+        // console.log("Current User Data:", userData);
+        if (!userData) {
+          throw new Error("User data not found in database");
+        }
         useStore.setState({
           user: {
-            id: currentUser.$id,
-            email: currentUser.email,
-            name: currentUser.name,
-            role,
+            id: userData.userId,
+            email: userData.email,
+            name: userData.name,
+            role: userData.role,
+            avatar: userData.avatar || "", // Optional avatar URL
           },
         });
 

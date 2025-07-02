@@ -41,6 +41,7 @@ interface User {
   email: string;
   name: string;
   role: "user" | "admin";
+  avatar?: string; // Optional avatar URL
 }
 
 interface StoreState {
@@ -162,6 +163,10 @@ const useStore = create<StoreState>((set, get) => ({
       const currentUser = await getCurrentUser();
       console.log("Logged in User:", currentUser);
 
+      if (!currentUser) {
+        throw new Error("Failed to get current user after login");
+      }
+
       const userData = await getUserById(currentUser.$id);
       console.log("User Data:", userData);
 
@@ -171,6 +176,7 @@ const useStore = create<StoreState>((set, get) => ({
           email: userData.email,
           name: userData.name,
           role: userData.role || "user", // Default to 'user' if role is not set
+          avatar: userData.avatar || "", // Optional avatar URL
         },
       });
 
@@ -180,10 +186,11 @@ const useStore = create<StoreState>((set, get) => ({
         description: `Welcome back, ${userData.name}`,
       });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Invalid credentials";
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: error.message || "Invalid credentials",
+        description: errorMessage,
       });
       throw error;
     }
@@ -199,10 +206,11 @@ const useStore = create<StoreState>((set, get) => ({
         description: "You have been logged out successfully.",
       });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Logout failed";
       toast({
         variant: "destructive",
         title: "Logout Error",
-        description: error.message,
+        description: errorMessage,
       });
     }
   },
@@ -218,6 +226,7 @@ const useStore = create<StoreState>((set, get) => ({
           email: result.email,
           name: result.name,
           role: result.role,
+          avatar: result.avatar || "", // Optional avatar URL
         },
       });
 
@@ -227,10 +236,11 @@ const useStore = create<StoreState>((set, get) => ({
         description: `Welcome, ${result.name}`,
       });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Registration failed";
       toast({
         variant: "destructive",
         title: "Signup Error",
-        description: error.message,
+        description: errorMessage,
       });
       throw error;
     }
