@@ -141,15 +141,24 @@ export const getUserById = async (userId: string) => {
 };
 
 // Product APIs
-export const createProduct = async (product: Omit<Product, 'id'>): Promise<Product> => {
+export const createProduct = async (
+  product: Omit<Product, "id">
+): Promise<Product> => {
+  const generatedId = ID.unique();
+
   try {
     const response = await databases.createDocument(
       databaseId,
       productCollectionId,
-      ID.unique(),
-      product
+      generatedId,
+      {
+        ...product,
+        id: generatedId, // Required by Appwrite schema
+      }
     );
-    return { ...product, id: response.$id };
+
+    console.log("✅ Product created:", response);
+    return { ...product, id: generatedId };
   } catch (err) {
     console.error("❌ Error creating product:", err);
     throw err;
@@ -158,8 +167,11 @@ export const createProduct = async (product: Omit<Product, 'id'>): Promise<Produ
 
 export const getAllProducts = async (): Promise<Product[]> => {
   try {
-    const response = await databases.listDocuments(databaseId, productCollectionId);
-    return response.documents.map(doc => ({
+    const response = await databases.listDocuments(
+      databaseId,
+      productCollectionId
+    );
+    return response.documents.map((doc) => ({
       id: doc.$id,
       name: doc.name,
       image: doc.image,
@@ -180,7 +192,11 @@ export const getAllProducts = async (): Promise<Product[]> => {
 
 export const getProductById = async (id: string): Promise<Product> => {
   try {
-    const response = await databases.getDocument(databaseId, productCollectionId, id);
+    const response = await databases.getDocument(
+      databaseId,
+      productCollectionId,
+      id
+    );
     return {
       id: response.$id,
       name: response.name,
@@ -201,20 +217,22 @@ export const getProductById = async (id: string): Promise<Product> => {
 };
 
 // Order APIs
-export const createOrder = async (order: Omit<Order, 'id' | 'orderDate'>): Promise<Order> => {
+export const createOrder = async (
+  order: Omit<Order, "id" | "orderDate">
+): Promise<Order> => {
   try {
     const orderData = {
       ...order,
       orderDate: new Date().toISOString(),
     };
-    
+
     const response = await databases.createDocument(
       databaseId,
       orderCollectionId,
       ID.unique(),
       orderData
     );
-    
+
     return {
       id: response.$id,
       userId: response.userId,
@@ -232,11 +250,13 @@ export const createOrder = async (order: Omit<Order, 'id' | 'orderDate'>): Promi
 
 export const getOrdersByUser = async (userId: string): Promise<Order[]> => {
   try {
-    const response = await databases.listDocuments(databaseId, orderCollectionId, [
-      Query.equal("userId", userId),
-    ]);
-    
-    return response.documents.map(doc => ({
+    const response = await databases.listDocuments(
+      databaseId,
+      orderCollectionId,
+      [Query.equal("userId", userId)]
+    );
+
+    return response.documents.map((doc) => ({
       id: doc.$id,
       userId: doc.userId,
       items: doc.items,
@@ -252,21 +272,23 @@ export const getOrdersByUser = async (userId: string): Promise<Order[]> => {
 };
 
 // Custom Request APIs
-export const submitCustomRequestToDB = async (request: Omit<CustomRequest, 'id' | 'requestDate'>): Promise<CustomRequest> => {
+export const submitCustomRequestToDB = async (
+  request: Omit<CustomRequest, "id" | "requestDate">
+): Promise<CustomRequest> => {
   try {
     const requestData = {
       ...request,
       requestDate: new Date().toISOString(),
       status: "pending" as const,
     };
-    
+
     const response = await databases.createDocument(
       databaseId,
       requestCollectionId,
       ID.unique(),
       requestData
     );
-    
+
     return {
       id: response.$id,
       userId: response.userId,
@@ -283,13 +305,17 @@ export const submitCustomRequestToDB = async (request: Omit<CustomRequest, 'id' 
   }
 };
 
-export const getCustomRequestsByUser = async (userId: string): Promise<CustomRequest[]> => {
+export const getCustomRequestsByUser = async (
+  userId: string
+): Promise<CustomRequest[]> => {
   try {
-    const response = await databases.listDocuments(databaseId, requestCollectionId, [
-      Query.equal("userId", userId),
-    ]);
-    
-    return response.documents.map(doc => ({
+    const response = await databases.listDocuments(
+      databaseId,
+      requestCollectionId,
+      [Query.equal("userId", userId)]
+    );
+
+    return response.documents.map((doc) => ({
       id: doc.$id,
       userId: doc.userId,
       name: doc.name,
@@ -308,9 +334,12 @@ export const getCustomRequestsByUser = async (userId: string): Promise<CustomReq
 // Admin functions to get all requests
 export const getAllCustomRequests = async (): Promise<CustomRequest[]> => {
   try {
-    const response = await databases.listDocuments(databaseId, requestCollectionId);
-    
-    return response.documents.map(doc => ({
+    const response = await databases.listDocuments(
+      databaseId,
+      requestCollectionId
+    );
+
+    return response.documents.map((doc) => ({
       id: doc.$id,
       userId: doc.userId,
       name: doc.name,
@@ -326,7 +355,10 @@ export const getAllCustomRequests = async (): Promise<CustomRequest[]> => {
   }
 };
 
-export const updateCustomRequestStatus = async (requestId: string, status: CustomRequest['status']): Promise<CustomRequest> => {
+export const updateCustomRequestStatus = async (
+  requestId: string,
+  status: CustomRequest["status"]
+): Promise<CustomRequest> => {
   try {
     const response = await databases.updateDocument(
       databaseId,
@@ -334,7 +366,7 @@ export const updateCustomRequestStatus = async (requestId: string, status: Custo
       requestId,
       { status }
     );
-    
+
     return {
       id: response.$id,
       userId: response.userId,

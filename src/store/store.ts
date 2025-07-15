@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { toast } from "../hooks/use-toast";
-import productsData from "../data/demo-products.json";
 import {
   signUp,
   logIn,
@@ -8,9 +7,10 @@ import {
   getCurrentUser,
   getUserById,
 } from "../api/appwrite";
+import { getAllProducts } from "../api/appwrite";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   image: string;
   description: string;
@@ -41,7 +41,7 @@ interface User {
   email: string;
   name: string;
   role: "user" | "admin";
-  avatar?: string; // Optional avatar URL
+  avatar?: string;
 }
 
 interface StoreState {
@@ -49,9 +49,10 @@ interface StoreState {
   cart: CartItem[];
   customRequests: CustomRequest[];
   user: User | null;
+  fetchProducts: () => Promise<void>;
   addToCart: (product: Product) => void;
-  removeFromCart: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
+  removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   submitCustomRequest: (request: CustomRequest) => void;
   login: (email: string, password: string) => Promise<void>;
@@ -60,10 +61,24 @@ interface StoreState {
 }
 
 const useStore = create<StoreState>((set, get) => ({
-  products: productsData as Product[],
+  products: [],
   cart: [],
   customRequests: [],
   user: null,
+
+  fetchProducts: async () => {
+    try {
+      const products = await getAllProducts();
+      set({ products });
+    } catch (error) {
+      console.error("Error fetching products in store:", error);
+      toast({
+        variant: "destructive",
+        title: "Fetch Error",
+        description: "Unable to load products.",
+      });
+    }
+  },
 
   addToCart: (product: Product) =>
     set((state) => {
@@ -72,7 +87,6 @@ const useStore = create<StoreState>((set, get) => ({
       );
 
       if (existingItem) {
-        // Show toast for quantity increase
         toast({
           variant: "success",
           title: "Quantity Updated!",
@@ -89,7 +103,6 @@ const useStore = create<StoreState>((set, get) => ({
           ),
         };
       } else {
-        // Show toast for new item added
         toast({
           variant: "success",
           title: "Added to Cart!",
@@ -102,7 +115,7 @@ const useStore = create<StoreState>((set, get) => ({
       }
     }),
 
-  removeFromCart: (productId: number) =>
+  removeFromCart: (productId: string) =>
     set((state) => {
       const item = state.cart.find((item) => item.product.id === productId);
       if (item) {
@@ -118,7 +131,7 @@ const useStore = create<StoreState>((set, get) => ({
       };
     }),
 
-  updateQuantity: (productId: number, quantity: number) =>
+  updateQuantity: (productId: string, quantity: number) =>
     set((state) => {
       const item = state.cart.find((item) => item.product.id === productId);
       if (item) {
@@ -161,22 +174,17 @@ const useStore = create<StoreState>((set, get) => ({
     try {
       await logIn({ email, password });
       const currentUser = await getCurrentUser();
-      console.log("Logged in User:", currentUser);
-
-      if (!currentUser) {
-        throw new Error("Failed to get current user after login");
-      }
+      if (!currentUser) throw new Error("Failed to get current user");
 
       const userData = await getUserById(currentUser.$id);
-      console.log("User Data:", userData);
 
       set({
         user: {
           id: userData.$id,
           email: userData.email,
           name: userData.name,
-          role: userData.role || "user", // Default to 'user' if role is not set
-          avatar: userData.avatar || "", // Optional avatar URL
+          role: userData.role || "user",
+          avatar: userData.avatar || "",
         },
       });
 
@@ -186,7 +194,8 @@ const useStore = create<StoreState>((set, get) => ({
         description: `Welcome back, ${userData.name}`,
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Invalid credentials";
+      const errorMessage =
+        error instanceof Error ? error.message : "Invalid credentials";
       toast({
         variant: "destructive",
         title: "Login Failed",
@@ -206,7 +215,8 @@ const useStore = create<StoreState>((set, get) => ({
         description: "You have been logged out successfully.",
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Logout failed";
+      const errorMessage =
+        error instanceof Error ? error.message : "Logout failed";
       toast({
         variant: "destructive",
         title: "Logout Error",
@@ -218,7 +228,6 @@ const useStore = create<StoreState>((set, get) => ({
   register: async (email, password, name) => {
     try {
       const result = await signUp({ email, password, name });
-      console.log("Registered User:", result);
 
       set({
         user: {
@@ -226,7 +235,7 @@ const useStore = create<StoreState>((set, get) => ({
           email: result.email,
           name: result.name,
           role: result.role,
-          avatar: result.avatar || "", // Optional avatar URL
+          avatar: result.avatar || "",
         },
       });
 
@@ -236,7 +245,8 @@ const useStore = create<StoreState>((set, get) => ({
         description: `Welcome, ${result.name}`,
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Registration failed";
+      const errorMessage =
+        error instanceof Error ? error.message : "Registration failed";
       toast({
         variant: "destructive",
         title: "Signup Error",
